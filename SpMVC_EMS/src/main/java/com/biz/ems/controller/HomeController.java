@@ -1,0 +1,108 @@
+package com.biz.ems.controller;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.Locale;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+
+import com.biz.ems.model.EmsVO;
+import com.biz.ems.service.EmsService;
+
+import lombok.extern.slf4j.Slf4j;
+
+/**
+ * Handles requests for the application home page.
+ */
+@Slf4j
+@Controller
+public class HomeController {
+	
+	@Autowired
+	@Qualifier("emsServiceV1")
+	private EmsService emsService;
+	
+	@RequestMapping(value = "/", method = RequestMethod.GET)
+	public String home(Locale locale, Model model) {
+		
+		List<EmsVO> emsList = emsService.selectAll();
+		model.addAttribute("EMS_LIST",emsList);
+		return "home";
+	}
+	
+	@RequestMapping(value = "/write",method=RequestMethod.GET)
+	public String write(Model model) {
+	
+		LocalDateTime ldt = LocalDateTime.now();
+		String cd = DateTimeFormatter.ofPattern("yyyy-MM-dd").format(ldt);
+		String ct = DateTimeFormatter.ofPattern("HH:mm:ss").format(ldt);
+		
+		EmsVO emsVO = EmsVO.builder()
+						.s_date(cd)
+						.s_time(ct)
+						.build();
+		
+		model.addAttribute("EMS",emsVO);
+		return "ems-write";
+	}
+	
+	@RequestMapping(value = "/write",method=RequestMethod.POST)
+	public String write(@ModelAttribute EmsVO emsVO,Model model) {
+		
+		int ret = emsService.insert(emsVO);
+		if(ret > 0) {
+			log.debug("INERT 수행한 후 결과 {}개 성공",ret);
+		}
+		model.addAttribute("EMS",emsVO);
+		return "redirect:/";
+	}
+	
+	@RequestMapping(value="/update",method=RequestMethod.GET)
+	public String update(String id,Model model) {
+		
+		long long_id = Long.valueOf(id);
+
+		EmsVO emsVO = emsService.findById(long_id);
+		model.addAttribute("EMS",emsVO);
+		return "ems-write";
+	}
+	@RequestMapping(value="/update",method=RequestMethod.POST)
+	public String update(
+			EmsVO emsVO) {
+
+		log.debug("UPDATE 요청데이터 {}",emsVO.toString());
+		
+
+
+		int ret  = emsService.update(emsVO);
+		if(ret > 0) {
+			log.debug("업데이트된 데이터 개수 {}",ret);
+		}
+		return "redirect:/";
+	}
+	
+	@RequestMapping(value="/delete",method=RequestMethod.GET)
+	public String delete(String id) {
+		
+		long long_id = Long.valueOf(id);
+		EmsVO emsVO = emsService.findById(long_id);
+		
+		
+		int ret = emsService.delete(long_id);
+		if(ret > 0) {
+			log.debug("삭제된 데이터 개수 {}",ret);
+		}
+		return "redirect:/";
+	
+	}
+	
+	
+	
+}

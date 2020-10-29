@@ -1,0 +1,39 @@
+package com.biz.ems.service;
+
+import java.util.List;
+
+import com.biz.ems.model.EmsVO;
+
+public class EmsServiceImpl implements EmsService {
+
+	@Override
+	public List<EmsVO> selectAll() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public EmsVO findById(long id) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public int insert(EmsVO emsVO) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public int update(EmsVO emsVO) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public int delete(long id) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+}
